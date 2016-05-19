@@ -15,10 +15,18 @@
  */
 package org.springframework.social.facebook.api;
 
-import static org.junit.Assert.*;
-import static org.springframework.http.HttpMethod.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.util.List;
 
@@ -33,15 +41,15 @@ import org.springframework.util.StringUtils;
  */
 public class FeedTemplateTest extends AbstractFacebookApiTest {
 
-	
-	
+
+
 	@Test
 	public void getFeed() {
 		mockServer.expect(requestTo(fbUrl("me/feed?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-				.andExpect(method(GET))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
-		List<Post> feed = facebook.feedOperations().getFeed();
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
+		final List<Post> feed = facebook.feedOperations().getFeed();
 		assertEquals(5, feed.size());
 		assertFeedEntries(feed);
 	}
@@ -49,10 +57,10 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	@Test
 	public void getFeed_withPagedListParameters_since() {
 		mockServer.expect(requestTo(fbUrl("me/feed?limit=25&since=1360384019&fields=" + ALL_POST_FIELDS_STR)))
-				.andExpect(method(GET))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
-		List<Post> feed = facebook.feedOperations().getFeed(new PagingParameters(25, null, 1360384019L, null));
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
+		final List<Post> feed = facebook.feedOperations().getFeed(new PagingParameters(25, null, 1360384019L, null));
 		assertEquals(5, feed.size());
 		assertFeedEntries(feed);
 	}
@@ -60,10 +68,10 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	@Test
 	public void getFeed_withPagedListParameters_until() {
 		mockServer.expect(requestTo(fbUrl("me/feed?limit=25&until=1360384019&fields=" + ALL_POST_FIELDS_STR)))
-				.andExpect(method(GET))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
-		List<Post> feed = facebook.feedOperations().getFeed(new PagingParameters(25, null, null, 1360384019L));
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
+		final List<Post> feed = facebook.feedOperations().getFeed(new PagingParameters(25, null, null, 1360384019L));
 		assertEquals(5, feed.size());
 		assertFeedEntries(feed);
 	}
@@ -71,11 +79,11 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	@Test
 	public void getFeed_withUnknownType() {
 		mockServer.expect(requestTo(fbUrl("me/feed?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-				.andExpect(method(GET))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("feed-with-unknown-type"), MediaType.APPLICATION_JSON));
-		List<Post> feed = facebook.feedOperations().getFeed();
-		assertEquals(1, feed.size());		
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("feed-with-unknown-type"), MediaType.APPLICATION_JSON));
+		final List<Post> feed = facebook.feedOperations().getFeed();
+		assertEquals(1, feed.size());
 		assertTrue(feed.get(0) instanceof Post);
 		assertEquals(PostType.UNKNOWN, feed.get(0).getType());
 		assertEquals("100001387295207_160065090716400", feed.get(0).getId());
@@ -88,21 +96,21 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	@Test
 	public void getFeed_forOwnerId() {
 		mockServer.expect(requestTo(fbUrl("12345678/feed?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-				.andExpect(method(GET))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
-		List<Post> feed = facebook.feedOperations().getFeed("12345678");
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
+		final List<Post> feed = facebook.feedOperations().getFeed("12345678");
 		assertEquals(5, feed.size());
 		assertFeedEntries(feed);
-	}	
+	}
 
 	@Test
 	public void getHomeFeed() {
 		mockServer.expect(requestTo(fbUrl("me/home?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
-		List<Post> homeFeed = facebook.feedOperations().getHomeFeed();
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
+		final List<Post> homeFeed = facebook.feedOperations().getHomeFeed();
 		assertEquals(5, homeFeed.size());
 		assertFeedEntries(homeFeed);
 	}
@@ -110,9 +118,9 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	@Test
 	public void getStatuses() {
 		mockServer.expect(requestTo(fbUrl("me/statuses?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("user-statuses"), MediaType.APPLICATION_JSON));
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("user-statuses"), MediaType.APPLICATION_JSON));
 		assertStatuses(facebook.feedOperations().getStatuses());
 	}
 
@@ -120,46 +128,46 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	@Test
 	public void getStatuses_forSpecificUser() {
 		mockServer.expect(requestTo(fbUrl("24680/statuses?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("user-statuses"), MediaType.APPLICATION_JSON));
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("user-statuses"), MediaType.APPLICATION_JSON));
 		assertStatuses(facebook.feedOperations().getStatuses("24680"));
 	}
 
 	@Test
 	public void getLinks_preOctober2012() {
 		mockServer.expect(requestTo(fbUrl("me/links?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("links_preOct2012"), MediaType.APPLICATION_JSON));
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("links_preOct2012"), MediaType.APPLICATION_JSON));
 		assertLinks(facebook.feedOperations().getLinks());
 	}
 
 	@Test
 	public void getLinks() {
 		mockServer.expect(requestTo(fbUrl("me/links?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("links"), MediaType.APPLICATION_JSON));
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("links"), MediaType.APPLICATION_JSON));
 		assertLinks(facebook.feedOperations().getLinks());
 	}
 
 	@Test
 	public void getLinks_forSpecificUser() {
 		mockServer.expect(requestTo(fbUrl("13579/links?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("links"), MediaType.APPLICATION_JSON));
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("links"), MediaType.APPLICATION_JSON));
 		assertLinks(facebook.feedOperations().getLinks("13579"));
 	}
 
 	@Test
 	public void getPosts() {
 		mockServer.expect(requestTo(fbUrl("me/posts?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-				.andExpect(method(GET))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
-		List<Post> feed = facebook.feedOperations().getPosts();
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
+		final List<Post> feed = facebook.feedOperations().getPosts();
 		assertEquals(5, feed.size());
 		assertFeedEntries(feed);
 	}
@@ -167,21 +175,21 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	@Test
 	public void getPosts_forOwnerId() {
 		mockServer.expect(requestTo(fbUrl("12345678/posts?limit=25&fields=" + ALL_POST_FIELDS_STR)))
-				.andExpect(method(GET))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
-		List<Post> feed = facebook.feedOperations().getPosts("12345678");
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
+		final List<Post> feed = facebook.feedOperations().getPosts("12345678");
 		assertEquals(5, feed.size());
 		assertFeedEntries(feed);
-	}	
+	}
 
-	@Test 
+	@Test
 	public void getFeedEntry() {
 		mockServer.expect(requestTo(fbUrl("100001387295207_123939024341978")))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("post"), MediaType.APPLICATION_JSON));
-		Post feedEntry = facebook.feedOperations().getPost("100001387295207_123939024341978");
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("post"), MediaType.APPLICATION_JSON));
+		final Post feedEntry = facebook.feedOperations().getPost("100001387295207_123939024341978");
 		assertEquals(PostType.STATUS, feedEntry.getType());
 		assertEquals("100001387295207_123939024341978", feedEntry.getId());
 		assertEquals("Hello world!", feedEntry.getMessage());
@@ -189,13 +197,13 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 		assertEquals("Art Names", feedEntry.getFrom().getName());
 	}
 
-	@Test 
+	@Test
 	public void getFeedEntry_noLikes() {
 		mockServer.expect(requestTo(fbUrl("100001387295207_123939024341978")))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("post_nolikes"), MediaType.APPLICATION_JSON));
-		Post feedEntry = facebook.feedOperations().getPost("100001387295207_123939024341978");
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("post_nolikes"), MediaType.APPLICATION_JSON));
+		final Post feedEntry = facebook.feedOperations().getPost("100001387295207_123939024341978");
 		assertEquals(PostType.STATUS, feedEntry.getType());
 		assertEquals("100001387295207_123939024341978", feedEntry.getId());
 		assertEquals("Hello world!", feedEntry.getMessage());
@@ -205,12 +213,12 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 
 	@Test
 	public void updateStatus() throws Exception {
-		String requestBody = "message=Hello+Facebook+World";
+		final String requestBody = "message=Hello+Facebook+World";
 		mockServer.expect(requestTo(fbUrl("me/feed")))
-				.andExpect(method(POST))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-				.andExpect(content().string(requestBody))
-				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
+		.andExpect(method(POST))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andExpect(content().string(requestBody))
+		.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
 		assertEquals("123456_78901234", facebook.feedOperations().updateStatus("Hello Facebook World"));
 		mockServer.verify();
 	}
@@ -218,15 +226,15 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	@Test
 	public void updateStatus_duplicate() throws Exception {
 		mockServer.expect(requestTo(fbUrl("me/feed")))
-				.andExpect(method(POST))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-				.andExpect(content().string("message=Duplicate"))
-			.andRespond(withBadRequest().body(jsonResource("error-duplicate-status")).contentType(MediaType.APPLICATION_JSON));
-		
+		.andExpect(method(POST))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andExpect(content().string("message=Duplicate"))
+		.andRespond(withBadRequest().body(jsonResource("error-duplicate-status")).contentType(MediaType.APPLICATION_JSON));
+
 		try {
 			facebook.feedOperations().updateStatus("Duplicate");
 			fail();
-		} catch (DuplicateStatusException e) {
+		} catch (final DuplicateStatusException e) {
 			assertEquals("Duplicate status message", e.getMessage());
 			assertEquals("facebook", e.getProviderId());
 		}
@@ -234,131 +242,131 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 
 	@Test
 	public void post_message() throws Exception {
-		String requestBody = "message=Hello+Facebook+World";
+		final String requestBody = "message=Hello+Facebook+World";
 		mockServer.expect(requestTo(fbUrl("123456789/feed")))
-				.andExpect(method(POST))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-				.andExpect(content().string(requestBody))
-				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
+		.andExpect(method(POST))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andExpect(content().string(requestBody))
+		.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
 		assertEquals("123456_78901234", facebook.feedOperations().post("123456789", "Hello Facebook World"));
 		mockServer.verify();
 	}
 
 	@Test
 	public void post_link() throws Exception {
-		String requestBody = "link=someLink&name=some+name&caption=some+caption&description=some+description&message=Hello+Facebook+World";
+		final String requestBody = "link=someLink&name=some+name&caption=some+caption&description=some+description&message=Hello+Facebook+World";
 		mockServer.expect(requestTo(fbUrl("me/feed")))
-				.andExpect(method(POST))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-				.andExpect(content().string(requestBody))
-				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
-		FacebookLink link = new FacebookLink("someLink", "some name", "some caption", "some description");
+		.andExpect(method(POST))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andExpect(content().string(requestBody))
+		.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
+		final FacebookLink link = new FacebookLink("someLink", "some name", "some caption", "some description");
 		assertEquals("123456_78901234", facebook.feedOperations().postLink("Hello Facebook World", link));
 		mockServer.verify();
 	}
 
 	@Test
 	public void post_NewPost_messageOnly() throws Exception {
-		String requestBody = "message=Hello+Facebook+World";
+		final String requestBody = "message=Hello+Facebook+World";
 		mockServer.expect(requestTo(fbUrl("123456789/feed")))
-				.andExpect(method(POST))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-				.andExpect(content().string(requestBody))
-				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
+		.andExpect(method(POST))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andExpect(content().string(requestBody))
+		.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
 		assertEquals("123456_78901234", facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World")));
-		mockServer.verify();		
+		mockServer.verify();
 	}
 
 	// TODO: REVISIT POSTING WITH PRIVACY SETTINGS
-	
-//	@Test
-//	public void post_NewPost_withPrivacy() throws Exception {
-//		String requestBody = "message=Hello+Facebook+World&privacy=%7B%27value%27%3A+%27ALL_FRIENDS%27%7D";
-//		mockServer.expect(requestTo(fbUrl("123456789/feed"))
-//				.andExpect(method(POST))
-//				.andExpect(header("Authorization", "OAuth someAccessToken"))
-//				.andExpect(content().string(requestBody))
-//				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
-//		assertEquals("123456_78901234", facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World").privacy(Privacy.ALL_FRIENDS)));
-//		mockServer.verify();		
-//	}
-//
-//	@Test(expected=IllegalArgumentException.class)
-//	public void post_NewPost_withCustomPrivacy_noAllowOrDeny() throws Exception {
-//		facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World").privacy(Privacy.CUSTOM));
-//	}
-//	
-//	@Test
-//	public void post_NewPost_withCustomPrivacy_allow() throws Exception {
-//		String requestBody = "message=Hello+Facebook+World&privacy=%7B%27value%27%3A+%27CUSTOM%27%2C%27allow%27%3A+%2712345%2C54321%27%7D";
-//		mockServer.expect(requestTo(fbUrl("123456789/feed"))
-//				.andExpect(method(POST))
-//				.andExpect(header("Authorization", "OAuth someAccessToken"))
-//				.andExpect(content().string(requestBody))
-//				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
-//		assertEquals("123456_78901234", facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World").privacy(Privacy.CUSTOM).allow("12345","54321")));
-//		mockServer.verify();		
-//	}
-//
-//	@Test
-//	public void post_NewPost_withCustomPrivacy_deny() throws Exception {
-//		String requestBody = "message=Hello+Facebook+World&privacy=%7B%27value%27%3A+%27CUSTOM%27%2C%27deny%27%3A+%2712345%2C54321%27%7D";
-//		mockServer.expect(requestTo(fbUrl("123456789/feed"))
-//				.andExpect(method(POST))
-//				.andExpect(header("Authorization", "OAuth someAccessToken"))
-//				.andExpect(content().string(requestBody))
-//				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
-//		assertEquals("123456_78901234", facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World").privacy(Privacy.CUSTOM).deny("12345","54321")));
-//		mockServer.verify();		
-//	}
-//
-//	@Test
-//	public void post_NewPost_withCustomPrivacy_allowAndDeny() throws Exception {
-//		String requestBody = "message=Hello+Facebook+World&privacy=%7B%27value%27%3A+%27CUSTOM%27%2C%27allow%27%3A+%2712345%2C54321%27%2C%27deny%27%3A+%2767890%2C98765%27%7D";
-//		mockServer.expect(requestTo(fbUrl("123456789/feed"))
-//				.andExpect(method(POST))
-//				.andExpect(header("Authorization", "OAuth someAccessToken"))
-//				.andExpect(content().string(requestBody))
-//				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
-//		assertEquals("123456_78901234", facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World").privacy(Privacy.CUSTOM).deny("67890","98765").allow("12345", "54321")));
-//		mockServer.verify();		
-//	}
+
+	//	@Test
+	//	public void post_NewPost_withPrivacy() throws Exception {
+	//		String requestBody = "message=Hello+Facebook+World&privacy=%7B%27value%27%3A+%27ALL_FRIENDS%27%7D";
+	//		mockServer.expect(requestTo(fbUrl("123456789/feed"))
+	//				.andExpect(method(POST))
+	//				.andExpect(header("Authorization", "OAuth someAccessToken"))
+	//				.andExpect(content().string(requestBody))
+	//				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
+	//		assertEquals("123456_78901234", facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World").privacy(Privacy.ALL_FRIENDS)));
+	//		mockServer.verify();
+	//	}
+	//
+	//	@Test(expected=IllegalArgumentException.class)
+	//	public void post_NewPost_withCustomPrivacy_noAllowOrDeny() throws Exception {
+	//		facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World").privacy(Privacy.CUSTOM));
+	//	}
+	//
+	//	@Test
+	//	public void post_NewPost_withCustomPrivacy_allow() throws Exception {
+	//		String requestBody = "message=Hello+Facebook+World&privacy=%7B%27value%27%3A+%27CUSTOM%27%2C%27allow%27%3A+%2712345%2C54321%27%7D";
+	//		mockServer.expect(requestTo(fbUrl("123456789/feed"))
+	//				.andExpect(method(POST))
+	//				.andExpect(header("Authorization", "OAuth someAccessToken"))
+	//				.andExpect(content().string(requestBody))
+	//				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
+	//		assertEquals("123456_78901234", facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World").privacy(Privacy.CUSTOM).allow("12345","54321")));
+	//		mockServer.verify();
+	//	}
+	//
+	//	@Test
+	//	public void post_NewPost_withCustomPrivacy_deny() throws Exception {
+	//		String requestBody = "message=Hello+Facebook+World&privacy=%7B%27value%27%3A+%27CUSTOM%27%2C%27deny%27%3A+%2712345%2C54321%27%7D";
+	//		mockServer.expect(requestTo(fbUrl("123456789/feed"))
+	//				.andExpect(method(POST))
+	//				.andExpect(header("Authorization", "OAuth someAccessToken"))
+	//				.andExpect(content().string(requestBody))
+	//				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
+	//		assertEquals("123456_78901234", facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World").privacy(Privacy.CUSTOM).deny("12345","54321")));
+	//		mockServer.verify();
+	//	}
+	//
+	//	@Test
+	//	public void post_NewPost_withCustomPrivacy_allowAndDeny() throws Exception {
+	//		String requestBody = "message=Hello+Facebook+World&privacy=%7B%27value%27%3A+%27CUSTOM%27%2C%27allow%27%3A+%2712345%2C54321%27%2C%27deny%27%3A+%2767890%2C98765%27%7D";
+	//		mockServer.expect(requestTo(fbUrl("123456789/feed"))
+	//				.andExpect(method(POST))
+	//				.andExpect(header("Authorization", "OAuth someAccessToken"))
+	//				.andExpect(content().string(requestBody))
+	//				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
+	//		assertEquals("123456_78901234", facebook.feedOperations().post(new PostData("123456789").message("Hello Facebook World").privacy(Privacy.CUSTOM).deny("67890","98765").allow("12345", "54321")));
+	//		mockServer.verify();
+	//	}
 
 	@Test
 	public void post_NewPost_link() throws Exception {
-		String requestBody = "message=Hello+Facebook+World&link=someLink&name=some+name&caption=some+caption&description=some+description";
+		final String requestBody = "message=Hello+Facebook+World&link=someLink&name=some+name&caption=some+caption&description=some+description";
 		mockServer.expect(requestTo(fbUrl("123456789/feed")))
-				.andExpect(method(POST))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-				.andExpect(content().string(requestBody))
-				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
-		PostData newPost = new PostData("123456789")
-				.link("someLink", null, "some name", "some caption", "some description")
-				.message("Hello Facebook World");
+		.andExpect(method(POST))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andExpect(content().string(requestBody))
+		.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
+		final PostData newPost = new PostData("123456789")
+		.link("someLink", null, "some name", "some caption", "some description")
+		.message("Hello Facebook World");
 		assertEquals("123456_78901234", facebook.feedOperations().post(newPost));
-		mockServer.verify();		
+		mockServer.verify();
 	}
 
 	@Test
 	public void post_link_toAnotherFeed() throws Exception {
-		String requestBody = "link=someLink&name=some+name&caption=some+caption&description=some+description&message=Hello+Facebook+World";
+		final String requestBody = "link=someLink&name=some+name&caption=some+caption&description=some+description&message=Hello+Facebook+World";
 		mockServer.expect(requestTo(fbUrl("123456789/feed")))
-				.andExpect(method(POST))
-				.andExpect(header("Authorization", "OAuth someAccessToken"))
-				.andExpect(content().string(requestBody))
-				.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
-		FacebookLink link = new FacebookLink("someLink", "some name", "some caption", "some description");
+		.andExpect(method(POST))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andExpect(content().string(requestBody))
+		.andRespond(withSuccess("{\"id\":\"123456_78901234\"}", MediaType.APPLICATION_JSON));
+		final FacebookLink link = new FacebookLink("someLink", "some name", "some caption", "some description");
 		assertEquals("123456_78901234", facebook.feedOperations().postLink("123456789", "Hello Facebook World", link));
 		mockServer.verify();
 	}
 
 	@Test
 	public void deleteFeedEntry() {
-		String requestBody = "method=delete";
+		final String requestBody = "method=delete";
 		mockServer.expect(requestTo(fbUrl("123456_78901234")))
-				.andExpect(method(POST))
-				.andExpect(header("Authorization", "OAuth someAccessToken")).andExpect(content().string(requestBody))
-				.andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
+		.andExpect(method(POST))
+		.andExpect(header("Authorization", "OAuth someAccessToken")).andExpect(content().string(requestBody))
+		.andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
 		facebook.feedOperations().deletePost("123456_78901234");
 		mockServer.verify();
 	}
@@ -366,34 +374,34 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	@Test
 	public void getCheckins() {
 		mockServer.expect(requestTo(fbUrl("me/posts?offset=0&limit=25&with=location")))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("checkins"), MediaType.APPLICATION_JSON));
-		List<Post> checkins = facebook.feedOperations().getCheckins();
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("checkins"), MediaType.APPLICATION_JSON));
+		final List<Post> checkins = facebook.feedOperations().getCheckins();
 		assertCheckins(checkins);
 	}
 
 	@Test
 	public void getCheckin() {
 		mockServer.expect(requestTo(fbUrl("10150431253050580")))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("checkin"), MediaType.APPLICATION_JSON));
-		Post checkin = facebook.feedOperations().getCheckin("10150431253050580");
-		assertSingleCheckin(checkin);		
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("checkin"), MediaType.APPLICATION_JSON));
+		final Post checkin = facebook.feedOperations().getCheckin("10150431253050580");
+		assertSingleCheckin(checkin);
 	}
 
 	@Test
 	public void getCheckin_withStringLocation() {
 		mockServer.expect(requestTo(fbUrl("10150431253050580")))
-			.andExpect(method(GET))
-			.andExpect(header("Authorization", "OAuth someAccessToken"))
-			.andRespond(withSuccess(jsonResource("checkin-with-string-location"), MediaType.APPLICATION_JSON));
-		Post checkin = facebook.feedOperations().getCheckin("10150431253050580");
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("checkin-with-string-location"), MediaType.APPLICATION_JSON));
+		final Post checkin = facebook.feedOperations().getCheckin("10150431253050580");
 		assertEquals("10150811140650580", checkin.getId());
 		assertEquals("738140579", checkin.getFrom().getId());
 		assertEquals("Craig Walls", checkin.getFrom().getName());
-		Page place1 = checkin.getPlace();
+		final Page place1 = checkin.getPlace();
 		assertEquals("218213061560639", place1.getId());
 		assertEquals("f8 HACK 2011", place1.getName());
 		assertEquals("Facebook", checkin.getPlace().getLocation().getDescription());
@@ -403,11 +411,11 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	}
 
 
-	private void assertSingleCheckin(Post checkin) {
+	private void assertSingleCheckin(final Post checkin) {
 		assertEquals("10150431253050580", checkin.getId());
 		assertEquals("738140579", checkin.getFrom().getId());
 		assertEquals("Craig Walls", checkin.getFrom().getName());
-		Page place1 = checkin.getPlace();
+		final Page place1 = checkin.getPlace();
 		assertEquals("117372064948189", place1.getId());
 		assertEquals("Freebirds World Burrito", place1.getName());
 		assertEquals("238 W Campbell Rd", place1.getLocation().getStreet());
@@ -421,11 +429,11 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 		assertEquals("Facebook for iPhone", checkin.getApplication().getName());
 		assertEquals(toDate("2011-03-13T01:00:49+0000"), checkin.getCreatedTime());
 	}
-	
-	private void assertCheckins(List<Post> checkins) {
+
+	private void assertCheckins(final List<Post> checkins) {
 		assertEquals(2, checkins.size());
 		assertSingleCheckin(checkins.get(0));
-		Post checkin2 = checkins.get(1);
+		final Post checkin2 = checkins.get(1);
 		assertEquals("10150140239512040", checkin2.getId());
 		assertEquals("533477039", checkin2.getFrom().getId());
 		assertEquals("Raymie Walls", checkin2.getFrom().getName());
@@ -433,7 +441,7 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 		assertEquals("738140579", checkin2.getWithTags().get(0).getId());
 		assertEquals("Craig Walls", checkin2.getWithTags().get(0).getName());
 		assertEquals("With my favorite people! ;-)", checkin2.getMessage());
-		Page place2 = checkin2.getPlace();
+		final Page place2 = checkin2.getPlace();
 		assertEquals("150366431753543", place2.getId());
 		assertEquals("Somewhere", place2.getName());
 		assertEquals(35.0231428, place2.getLocation().getLatitude(), 0.0001);
@@ -442,8 +450,8 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 		assertEquals("Facebook for iPhone", checkin2.getApplication().getName());
 		assertEquals(toDate("2011-02-11T20:59:41+0000"), checkin2.getCreatedTime());
 	}
-	
-	private void assertFeedEntries(List<Post> feed) {
+
+	private void assertFeedEntries(final List<Post> feed) {
 		assertEquals(PostType.STATUS, feed.get(0).getType());
 		assertEquals("100001387295207_160065090716400", feed.get(0).getId());
 		assertEquals("Just trying something", feed.get(0).getMessage());
@@ -486,8 +494,8 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 		assertEquals("Like", feed.get(2).getActions().get(1).getName());
 		assertEquals("https://www.facebook.com/73579/posts/153453231377586", feed.get(2).getActions().get(1).getLink());
 	}
-	
-	private void assertLinks(List<Post> feed) {
+
+	private void assertLinks(final List<Post> feed) {
 		assertEquals(2, feed.size());
 		assertEquals(PostType.LINK, feed.get(0).getType());
 		assertEquals("125736073702566", feed.get(0).getId());
@@ -511,7 +519,7 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 		assertEquals("http://www.youtube.com/watch?v=QSLT2N-Ome8", feed.get(1).getLink());
 	}
 
-	private void assertStatuses(List<Post> statuses) {
+	private void assertStatuses(final List<Post> statuses) {
 		assertEquals(3, statuses.size());
 		assertEquals(PostType.STATUS, statuses.get(0).getType());
 		assertEquals("161195833936659", statuses.get(0).getId());
@@ -533,9 +541,10 @@ public class FeedTemplateTest extends AbstractFacebookApiTest {
 	}
 
 	private static final String[] ALL_POST_FIELDS = {
-			"id", "actions", "admin_creator", "application", "caption", "created_time", "description", "from", "icon",
-			"is_hidden", "is_published", "link", "message", "message_tags", "name", "object_id", "picture", "place", 
-			"privacy", "properties", "source", "status_type", "story", "to", "type", "updated_time", "with_tags", "shares"
+		"id", "actions", "admin_creator", "application", "caption", "created_time", "description", "from", "icon",
+		"is_hidden", "is_published", "link", "message", "message_tags", "name", "object_id", "picture", "place",
+ "privacy", "properties", "source",
+			"status_type", "story", "to", "type", "updated_time", "with_tags", "shares", "full_picture"
 	};
 
 	private static final String ALL_POST_FIELDS_STR = StringUtils.arrayToCommaDelimitedString(ALL_POST_FIELDS).replace(",", "%2C");

@@ -15,10 +15,12 @@
  */
 package org.springframework.social.facebook.api;
 
-import static org.junit.Assert.*;
-import static org.springframework.http.HttpMethod.*;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
+import static org.junit.Assert.assertEquals;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.util.List;
 
@@ -35,35 +37,36 @@ public class VersionedApiTest extends AbstractFacebookApiTest {
 
 	@Test
 	public void testVersionedFacebookTemplate() {
-		
+
 		facebook.setApiVersion("2.2");
 		mockServer.expect(requestTo("https://graph.facebook.com/v2.2/me/feed?limit=25&fields=" + ALL_POST_FIELDS_STR))
-				  .andExpect(method(GET))
-				  .andExpect(header("Authorization", "OAuth someAccessToken"))
-				  .andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
 
-		List<Post> feed = facebook.feedOperations().getFeed();
+		final List<Post> feed = facebook.feedOperations().getFeed();
 		assertEquals(5, feed.size());
 	}
-	
+
 	@Test
 	public void testUnversionedFacebookTemplate() {
-		
+
 		facebook.setApiVersion(null);
 		mockServer.expect(requestTo("https://graph.facebook.com/me/feed?limit=25&fields=" + ALL_POST_FIELDS_STR))
-				  .andExpect(method(GET))
-				  .andExpect(header("Authorization", "OAuth someAccessToken"))
-				  .andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
+		.andExpect(method(GET))
+		.andExpect(header("Authorization", "OAuth someAccessToken"))
+		.andRespond(withSuccess(jsonResource("feed"), MediaType.APPLICATION_JSON));
 
-		List<Post> feed = facebook.feedOperations().getFeed();
+		final List<Post> feed = facebook.feedOperations().getFeed();
 		assertEquals(5, feed.size());
 	}
 
-	
+
 	private static final String[] ALL_POST_FIELDS = {
-			"id", "actions", "admin_creator", "application", "caption", "created_time", "description", "from", "icon",
-			"is_hidden", "is_published", "link", "message", "message_tags", "name", "object_id", "picture", "place", 
-			"privacy", "properties", "source", "status_type", "story", "to", "type", "updated_time", "with_tags", "shares"
+		"id", "actions", "admin_creator", "application", "caption", "created_time", "description", "from", "icon",
+		"is_hidden", "is_published", "link", "message", "message_tags", "name", "object_id", "picture", "place",
+ "privacy", "properties", "source",
+			"status_type", "story", "to", "type", "updated_time", "with_tags", "shares", "full_picture"
 	};
 
 	private static final String ALL_POST_FIELDS_STR = StringUtils.arrayToCommaDelimitedString(ALL_POST_FIELDS).replace(",", "%2C");

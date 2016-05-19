@@ -23,15 +23,15 @@ import java.util.Map;
 
 
 /**
- * Model class representing an entry in a feed. 
+ * Model class representing an entry in a feed.
  * @author Craig Walls
  */
 public class Post extends FacebookObject {
-	
+
 	private String id;
-	
+
 	private List<Action> actions;
-	
+
 	private AdminCreator adminCreator;
 
 	private Reference application;
@@ -47,43 +47,45 @@ public class Post extends FacebookObject {
 	private String icon;
 
 	private boolean isHidden;
-	
+
 	private boolean isPublished;
-	
+
 	private String link;
-	
+
 	private String message;
-	
+
 	private Map<Integer,List<MessageTag>> messageTags;
-	
+
 	private String name;
-	
+
 	private String objectId;
-	
+
 	private String picture;
 
+	private String fullPicture;
+
 	private Page place;
-	
+
 	private Privacy privacy;
-	
-	private List<PostProperty> properties = new ArrayList<PostProperty>();
-	
+
+	private final List<PostProperty> properties = new ArrayList<PostProperty>();
+
 	private int sharesCount;
 
 	private String source;
-	
+
 	private StatusType statusType;
 
 	private String story;
 
 	private List<Reference> to;
-	
-	private PostType type = PostType.UNKNOWN;
-	
+
+	private final PostType type = PostType.UNKNOWN;
+
 	private Date updatedTime;
 
 	private List<Reference> withTags;
-			
+
 	public String getId() {
 		return id;
 	}
@@ -91,21 +93,21 @@ public class Post extends FacebookObject {
 	public List<Action> getActions() {
 		return actions;
 	}
-	
+
 	public AdminCreator getAdminCreator() {
 		return adminCreator;
 	}
-	
+
 	public Reference getApplication() {
 		return application;
 	}
 
 	// TODO: public ? getCallToAction() { ... }
-	
+
 	public String getCaption() {
 		return caption;
 	}
-	
+
 	public Date getCreatedTime() {
 		return createdTime;
 	}
@@ -125,11 +127,11 @@ public class Post extends FacebookObject {
 	public boolean isHidden() {
 		return isHidden;
 	}
-	
+
 	public boolean isPublished() {
 		return isPublished;
 	}
-	
+
 	public String getLink() {
 		return link;
 	}
@@ -149,39 +151,43 @@ public class Post extends FacebookObject {
 	public String getObjectId() {
 		return objectId;
 	}
-	
+
 	public String getPicture() {
 		return picture;
+	}
+
+	public String getFullPicture() {
+		return fullPicture;
 	}
 
 	public Page getPlace() {
 		return place;
 	}
-	
+
 	public Privacy getPrivacy() {
 		return privacy;
 	}
-	
+
 	public List<PostProperty> getProperties() {
 		return properties;
 	}
-	
+
 	public String getSource() {
 		return source;
 	}
-	
+
 	public StatusType getStatusType() {
 		return statusType;
 	}
-	
+
 	public String getStory() {
 		return story;
 	}
-	
+
 	public List<Reference> getTo() {
 		return to;
 	}
-	
+
 	public PostType getType() {
 		return type;
 	}
@@ -193,78 +199,78 @@ public class Post extends FacebookObject {
 	public List<Reference> getWithTags() {
 		return withTags;
 	}
-	
+
 	public int getShares() {
 		return sharesCount;
 	}
-	
+
 	public static class AdminCreator {
-		
+
 		private String id;
-		
+
 		private String name;
-		
+
 		private String namespace;
-		
+
 		public String getId() {
 			return id;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
-		
+
 		public String getNamespace() {
 			return namespace;
 		}
-		
+
 	}
-	
+
 	public static class Privacy {
-		
+
 		private String description;
-		
+
 		private PrivacyType value;
-		
+
 		private FriendsPrivacyType friends;
-		
+
 		private String networks;
-		
+
 		private String allow;
-		
+
 		private String deny;
-		
+
 		public String getDescription() {
 			return description;
 		}
-		
+
 		public PrivacyType getValue() {
 			return value;
 		}
-		
+
 		public FriendsPrivacyType getFriends() {
 			return friends;
 		}
-		
+
 		public String getNetworks() {
 			return networks;
 		}
-		
+
 		public String getAllow() {
 			return allow;
 		}
-		
+
 		public String getDeny() {
 			return deny;
 		}
-		
+
 	}
-	
+
 	public static enum PostType { LINK, STATUS, PHOTO, VIDEO, UNKNOWN }
-	
-	public static enum StatusType { MOBILE_STATUS_UPDATE, CREATED_NOTE, ADDED_PHOTOS, ADDED_VIDEO, SHARED_STORY, CREATED_GROUP, 
+
+	public static enum StatusType { MOBILE_STATUS_UPDATE, CREATED_NOTE, ADDED_PHOTOS, ADDED_VIDEO, SHARED_STORY, CREATED_GROUP,
 		CREATED_EVENT, WALL_POST, APP_CREATED_STORY, PUBLISHED_STORY, TAGGED_IN_PHOTO, APPROVED_FRIEND, UNKNOWN }
-	
+
 	public static enum PrivacyType { EVERYONE, ALL_FRIENDS, FRIENDS_OF_FRIENDS, SELF, CUSTOM, UNKNOWN }
 
 	public static enum FriendsPrivacyType { ALL_FRIENDS, FRIENDS_OF_FRIENDS, SOME_FRIENDS, UNKNOWN }

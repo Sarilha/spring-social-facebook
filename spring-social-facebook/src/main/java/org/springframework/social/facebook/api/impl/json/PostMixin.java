@@ -43,147 +43,150 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * Annotated mixin to add Jackson annotations to Post.
- * Also defines Post subtypes to deserialize into based on the "type" attribute. 
+ * Also defines Post subtypes to deserialize into based on the "type" attribute.
  * @author Craig Walls
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 abstract class PostMixin extends FacebookObjectMixin {
-	
+
 	@JsonProperty("id")
 	String id;
-	
+
 	@JsonProperty("actions")
 	List<Action> actions;
-	
+
 	@JsonProperty("admin_creator")
 	AdminCreator adminCreator;
-	
+
 	@JsonProperty("application")
 	Reference application;
 
 	@JsonProperty("caption")
 	String caption;
-	
+
 	@JsonProperty("created_time")
-	Date createdTime; 
+	Date createdTime;
 
 	@JsonProperty("description")
 	String description;
-	
-	@JsonProperty("from") 
-	Reference from; 
-	
+
+	@JsonProperty("from")
+	Reference from;
+
 	@JsonProperty("icon")
 	String icon;
-	
+
 	@JsonProperty("is_hidden")
 	boolean isHidden;
-	
+
 	@JsonProperty("is_published")
 	boolean isPublished;
 
 	@JsonProperty("link")
 	String link;
-	
+
 	@JsonProperty("message")
 	String message;
-	
+
 	@JsonProperty("message_tags")
 	@JsonDeserialize(using=MessageTagMapDeserializer.class)
 	Map<Integer,List<MessageTag>> messageTags;
-	
+
 	@JsonProperty("name")
 	String name;
-	
+
 	@JsonProperty("object_id")
 	String objectId;
-	
+
 	@JsonProperty("picture")
 	String picture;
-	
+
+	@JsonProperty("full_picture")
+	String fullPicture;
+
 	@JsonProperty("place")
 	Page place;
-	
+
 	@JsonProperty("privacy")
 	Privacy privacy;
-	
+
 	@JsonProperty("properties")
 	List<PostProperty> properties;
-	
+
 	@JsonProperty("source")
 	String source;
-	
+
 	@JsonProperty("status_type")
 	@JsonDeserialize(using = StatusTypeDeserializer.class)
 	StatusType statusType;
-	
+
 	@JsonProperty("story")
 	String story;
-	
+
 	@JsonProperty("to")
 	@JsonDeserialize(using = ReferenceListDeserializer.class)
 	List<Reference> to;
-	
+
 	@JsonProperty("type")
 	@JsonDeserialize(using = PostTypeDeserializer.class)
 	PostType type;
-	
+
 	@JsonProperty("updated_time")
 	Date updatedTime;
 
 	@JsonProperty("with_tags")
 	@JsonDeserialize(using = ReferenceListDeserializer.class)
 	List<Reference> withTags;
-	
+
 	@JsonProperty("shares")
 	@JsonDeserialize(using = CountDeserializer.class)
 	Integer sharesCount;
 
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public abstract static class AdminCreatorMixin {
-		
+
 		@JsonProperty("id")
 		String id;
-		
+
 		@JsonProperty("name")
 		String name;
-		
+
 		@JsonProperty("namespace")
 		String namespace;
-		
+
 	}
-	
+
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public abstract static class PrivacyMixin {
-		
+
 		@JsonProperty("description")
 		String description;
-		
+
 		@JsonProperty("value")
 		@JsonDeserialize(using = PrivacyTypeDeserializer.class)
 		PrivacyType value;
-		
+
 		@JsonProperty("friends")
 		@JsonDeserialize(using = FriendsPrivacyTypeDeserializer.class)
 		FriendsPrivacyType friends;
-		
+
 		@JsonProperty("networks")
 		String networks;
-		
+
 		@JsonProperty("allow")
 		String allow;
-		
+
 		@JsonProperty("deny")
 		String deny;
 
 	}
-	
+
 	private static class PostTypeDeserializer extends JsonDeserializer<PostType> {
 		@Override
-		public PostType deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		public PostType deserialize(final JsonParser jp, final DeserializationContext ctxt) throws IOException, JsonProcessingException {
 			try {
 				return PostType.valueOf(jp.getText().toUpperCase());
-			} catch (IllegalArgumentException e) {
+			} catch (final IllegalArgumentException e) {
 				return PostType.UNKNOWN;
 			}
 		}
@@ -191,10 +194,10 @@ abstract class PostMixin extends FacebookObjectMixin {
 
 	private static class PrivacyTypeDeserializer extends JsonDeserializer<PrivacyType> {
 		@Override
-		public PrivacyType deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		public PrivacyType deserialize(final JsonParser jp, final DeserializationContext ctxt) throws IOException, JsonProcessingException {
 			try {
 				return PrivacyType.valueOf(jp.getText().toUpperCase());
-			} catch (IllegalArgumentException e) {
+			} catch (final IllegalArgumentException e) {
 				return PrivacyType.UNKNOWN;
 			}
 		}
@@ -202,10 +205,10 @@ abstract class PostMixin extends FacebookObjectMixin {
 
 	private static class FriendsPrivacyTypeDeserializer extends JsonDeserializer<FriendsPrivacyType> {
 		@Override
-		public FriendsPrivacyType deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		public FriendsPrivacyType deserialize(final JsonParser jp, final DeserializationContext ctxt) throws IOException, JsonProcessingException {
 			try {
 				return FriendsPrivacyType.valueOf(jp.getText().toUpperCase());
-			} catch (IllegalArgumentException e) {
+			} catch (final IllegalArgumentException e) {
 				return FriendsPrivacyType.UNKNOWN;
 			}
 		}
@@ -213,20 +216,20 @@ abstract class PostMixin extends FacebookObjectMixin {
 
 	private static class StatusTypeDeserializer extends JsonDeserializer<StatusType> {
 		@Override
-		public StatusType deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+		public StatusType deserialize(final JsonParser jp, final DeserializationContext ctxt) throws IOException, JsonProcessingException {
 			return StatusType.valueOf(jp.getText().toUpperCase());
 		}
 	}
 
 	private static class CountDeserializer extends JsonDeserializer<Integer> {
 		@Override
-		public Integer deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-			Map map = jp.readValueAs(Map.class);
-			return map.containsKey("count") ? Integer.valueOf(String.valueOf(map.get("count"))): 0; 
+		public Integer deserialize(final JsonParser jp, final DeserializationContext ctxt) throws IOException, JsonProcessingException {
+			final Map map = jp.readValueAs(Map.class);
+			return map.containsKey("count") ? Integer.valueOf(String.valueOf(map.get("count"))): 0;
 		}
-		
+
 		@Override
-		public Integer getNullValue(DeserializationContext ctxt) throws JsonMappingException {
+		public Integer getNullValue(final DeserializationContext ctxt) throws JsonMappingException {
 			return 0;
 		}
 	}
